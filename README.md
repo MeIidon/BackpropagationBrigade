@@ -26,4 +26,4 @@ Az adatok letöltését a `get_data.sh` script végzi.
 
 ### Adatok előkészítése a tanításhoz, végeredmény: tanító, validációs és teszt be- és kimenetek.
 
-TODO: A **.tfrec** fájlok transzformálása rendes képekké.
+A `python src/main.py` futtatása elvégzi az adatok betöltését és előkészítését a tanításra.
