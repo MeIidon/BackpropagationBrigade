@@ -20,15 +20,15 @@ else:
 
 print("REPLICAS: ", strategy.num_replicas_in_sync)
 
-GCS_DS_PATH = "gs://kds-15a35095dc89b4ea0cfbc0b805269c9ef228f63e9a0bd4432b2dedc9"
+DATASET_PATH = "data"
 
 IMAGE_SIZE = [512, 512]
-GCS_PATH = GCS_DS_PATH + "/tfrecords-jpeg-512x512"
+PATH = DATASET_PATH + "/tfrecords-jpeg-512x512"
 AUTO = tf.data.experimental.AUTOTUNE
 
-TRAINING_FILENAMES = tf.io.gfile.glob(GCS_PATH + "/train/*.tfrec")
-VALIDATION_FILENAMES = tf.io.gfile.glob(GCS_PATH + "/val/*.tfrec")
-TEST_FILENAMES = tf.io.gfile.glob(GCS_PATH + "/test/*.tfrec")
+TRAINING_FILENAMES = tf.io.gfile.glob(PATH + "/train/*.tfrec")
+VALIDATION_FILENAMES = tf.io.gfile.glob(PATH + "/val/*.tfrec")
+TEST_FILENAMES = tf.io.gfile.glob(PATH + "/test/*.tfrec")
 
 CLASSES = [
     "pink primrose",  # 0

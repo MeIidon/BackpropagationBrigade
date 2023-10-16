@@ -11,6 +11,7 @@
         "fontdict",
         "fontsize",
         "gaura",
+        "gfile",
         "hspace",
         "imshow",
         "linewidth",
