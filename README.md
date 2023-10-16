@@ -22,7 +22,7 @@ Az adatok letöltését a `get_data.sh` script végzi.
 
 ### Adatok feltárása, vizualizáció (ha szükséges).
 
-TODO: Mutatni egy képet egy virágról.
+![](docs/flowers.png)
 
 ### Adatok előkészítése a tanításhoz, végeredmény: tanító, validációs és teszt be- és kimenetek.
 
