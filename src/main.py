@@ -49,28 +49,28 @@ def decode_image(image_data):
     image = tf.reshape(image, [*IMAGE_SIZE, 3]) # explicit size needed for TPU
     return image
 
-def read_labeled_tfrecord(example):
-    LABELED_TFREC_FORMAT = {
+def read_labelled_tfrecord(example):
+    LABELLED_TFREC_FORMAT = {
         "image": tf.io.FixedLenFeature([], tf.string), # tf.string means bytestring
         "class": tf.io.FixedLenFeature([], tf.int64),  # shape [] means single element
     }
-    example = tf.io.parse_single_example(example, LABELED_TFREC_FORMAT)
+    example = tf.io.parse_single_example(example, LABELLED_TFREC_FORMAT)
     image = decode_image(example['image'])
     label = tf.cast(example['class'], tf.int32)
     return image, label # returns a dataset of (image, label) pairs
 
-def read_unlabeled_tfrecord(example):
-    UNLABELED_TFREC_FORMAT = {
+def read_unlabelled_tfrecord(example):
+    UNLABELLED_TFREC_FORMAT = {
         "image": tf.io.FixedLenFeature([], tf.string), # tf.string means bytestring
         "id": tf.io.FixedLenFeature([], tf.string),  # shape [] means single element
         # class is missing, this competitions's challenge is to predict flower classes for the test dataset
     }
-    example = tf.io.parse_single_example(example, UNLABELED_TFREC_FORMAT)
+    example = tf.io.parse_single_example(example, UNLABELLED_TFREC_FORMAT)
     image = decode_image(example['image'])
-    idnum = example['id']
-    return image, idnum # returns a dataset of image(s)
+    id_num = example['id']
+    return image, id_num # returns a dataset of image(s)
 
-def load_dataset(filenames, labeled=True, ordered=False):
+def load_dataset(filenames, labelled=True, ordered=False):
     # Read from TFRecords. For optimal performance, reading from multiple files at once and
     # disregarding data order. Order does not matter since we will be shuffling the data anyway.
 
@@ -80,8 +80,8 @@ def load_dataset(filenames, labeled=True, ordered=False):
 
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTO) # automatically interleaves reads from multiple files
     dataset = dataset.with_options(ignore_order) # uses data as soon as it streams in, rather than in its original order
-    dataset = dataset.map(read_labeled_tfrecord if labeled else read_unlabeled_tfrecord, num_parallel_calls=AUTO)
-    # returns a dataset of (image, label) pairs if labeled=True or (image, id) pairs if labeled=False
+    dataset = dataset.map(read_labelled_tfrecord if labelled else read_unlabelled_tfrecord, num_parallel_calls=AUTO)
+    # returns a dataset of (image, label) pairs if labelled=True or (image, id) pairs if labelled=False
     return dataset
 
 def data_augment(image, label):
@@ -94,7 +94,7 @@ def data_augment(image, label):
     return image, label
 
 def get_training_dataset():
-    dataset = load_dataset(TRAINING_FILENAMES, labeled=True)
+    dataset = load_dataset(TRAINING_FILENAMES, labelled=True)
     dataset = dataset.map(data_augment, num_parallel_calls=AUTO)
     dataset = dataset.repeat() # the training dataset must repeat for several epochs
     dataset = dataset.shuffle(2048)
@@ -103,14 +103,14 @@ def get_training_dataset():
     return dataset
 
 def get_validation_dataset(ordered=False):
-    dataset = load_dataset(VALIDATION_FILENAMES, labeled=True, ordered=ordered)
+    dataset = load_dataset(VALIDATION_FILENAMES, labelled=True, ordered=ordered)
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.cache()
     dataset = dataset.prefetch(AUTO)
     return dataset
 
 def get_test_dataset(ordered=False):
-    dataset = load_dataset(TEST_FILENAMES, labeled=False, ordered=ordered)
+    dataset = load_dataset(TEST_FILENAMES, labelled=False, ordered=ordered)
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(AUTO)
     return dataset
@@ -124,7 +124,7 @@ def count_data_items(filenames):
 NUM_TRAINING_IMAGES = count_data_items(TRAINING_FILENAMES)
 NUM_VALIDATION_IMAGES = count_data_items(VALIDATION_FILENAMES)
 NUM_TEST_IMAGES = count_data_items(TEST_FILENAMES)
-print('Dataset: {} training images, {} validation images, {} unlabeled test images'.format(NUM_TRAINING_IMAGES, NUM_VALIDATION_IMAGES, NUM_TEST_IMAGES))
+print('Dataset: {} training images, {} validation images, {} unlabelled test images'.format(NUM_TRAINING_IMAGES, NUM_VALIDATION_IMAGES, NUM_TEST_IMAGES))
 
 # Define the batch size. This will be 16 with TPU off and 128 (=16*8) with TPU on
 BATCH_SIZE = 16 * strategy.num_replicas_in_sync
@@ -145,9 +145,9 @@ for image, label in ds_train.take(3):
 print("Training data label examples:", label.numpy())
 
 print("Test data shapes:")
-for image, idnum in ds_test.take(3):
-    print(image.numpy().shape, idnum.numpy().shape)
-print("Test data IDs:", idnum.numpy().astype('U')) # U=unicode string
+for image, id_num in ds_test.take(3):
+    print(image.numpy().shape, id_num.numpy().shape)
+print("Test data IDs:", id_num.numpy().astype('U')) # U=unicode string
 
 from matplotlib import pyplot as plt
 
@@ -169,15 +169,15 @@ def title_from_label_and_target(label, correct_label):
     return "{} [{}{}{}]".format(CLASSES[label], 'OK' if correct else 'NO', u"\u2192" if not correct else '',
                                 CLASSES[correct_label] if not correct else ''), correct
 
-def display_one_flower(image, title, subplot, red=False, titlesize=16):
+def display_one_flower(image, title, subplot, red=False, title_size=16):
     plt.subplot(*subplot)
     plt.axis('off')
     plt.imshow(image)
     if len(title) > 0:
-        plt.title(title, fontsize=int(titlesize) if not red else int(titlesize/1.2), color='red' if red else 'black', fontdict={'verticalalignment':'center'}, pad=int(titlesize/1.5))
+        plt.title(title, fontsize=int(title_size) if not red else int(title_size/1.2), color='red' if red else 'black', fontdict={'verticalalignment':'center'}, pad=int(title_size/1.5))
     return (subplot[0], subplot[1], subplot[2]+1)
 
-def display_batch_of_images(databatch, predictions=None):
+def display_batch_of_images(data_batch, predictions=None):
     """This will work with:
     display_batch_of_images(images)
     display_batch_of_images(images, predictions)
@@ -185,7 +185,7 @@ def display_batch_of_images(databatch, predictions=None):
     display_batch_of_images((images, labels), predictions)
     """
     # data
-    images, labels = batch_to_numpy_images_and_labels(databatch)
+    images, labels = batch_to_numpy_images_and_labels(data_batch)
     if labels is None:
         labels = [None for _ in enumerate(images)]
 
@@ -209,8 +209,8 @@ def display_batch_of_images(databatch, predictions=None):
         correct = True
         if predictions is not None:
             title, correct = title_from_label_and_target(predictions[i], label)
-        dynamic_titlesize = FIGSIZE*SPACING/max(rows,cols)*40+3 # magic formula tested to work from 1x1 to 10x10 images
-        subplot = display_one_flower(image, title, subplot, not correct, titlesize=dynamic_titlesize)
+        dynamic_title_size = FIGSIZE*SPACING/max(rows,cols)*40+3 # magic formula tested to work from 1x1 to 10x10 images
+        subplot = display_one_flower(image, title, subplot, not correct, title_size=dynamic_title_size)
 
     #layout
     plt.tight_layout()

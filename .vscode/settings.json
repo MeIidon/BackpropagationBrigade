@@ -1,7 +1,32 @@
 {
     "cSpell.language": "en-GB",
     "cSpell.words": [
+        "astype",
+        "bromelia",
+        "cattleya",
+        "cautleya",
+        "dtype",
+        "facecolor",
+        "figsize",
+        "fontdict",
+        "fontsize",
+        "gaura",
+        "hspace",
+        "imshow",
+        "linewidth",
+        "masterwort",
+        "printoptions",
+        "silverbush",
+        "spicata",
         "tensorflow",
-        "tfrec"
+        "tfrec",
+        "tfrecord",
+        "tfrecords",
+        "unbatch",
+        "verticalalignment",
+        "wspace",
+        "xlabel",
+        "ylabel",
+        "ylim"
     ]
 }
