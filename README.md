@@ -1,29 +1,29 @@
 # Flower Classification
 
-## Csapat
+## Team
 
-A csapatunk neve: **BackpropagationBrigade**.
+Our team name is **BackpropagationBrigade**.
 
-A csapat tagjai:
+Team members:
 
-| Név                   | Neptun kód |
-| --------------------- | ---------- |
-| Háhn Nikoletta Hedvig | N2FGBL     |
-| Skáre Erik            | Z7ZF6D     |
-| Szommer Zsombor       | MM5NOT     |
+| Name                  | Neptun code |
+| --------------------- | ----------- |
+| Háhn Nikoletta Hedvig | N2FGBL      |
+| Skáre Erik            | Z7ZF6D      |
+| Szommer Zsombor       | MM5NOT      |
 
-## Nagy házi feladat - Milestone 1.
+## Big homework - Milestone 1.
 
-### Adatforrás megjelölése és letöltést végző scriptek.
+### Identify data source and download scripts.
 
-A [Flower Classification](https://www.kaggle.com/competitions/tpu-getting-started) Kaggle competition-t csináljuk.
+We are doing the [Flower Classification](https://www.kaggle.com/competitions/tpu-getting-started) Kaggle competition.
 
-Az adatok letöltését a `get_data.sh` script végzi.
+The `get_data.sh` script is used to download the data.
 
-### Adatok feltárása, vizualizáció (ha szükséges).
+### Data exploration, visualization (if necessary).
 
 ![](docs/flowers.png)
 
-### Adatok előkészítése a tanításhoz, végeredmény: tanító, validációs és teszt be- és kimenetek.
+### Preparing data for train, final output: train, validation and test inputs and outputs.
 
-A `python src/main.py` futtatása elvégzi az adatok betöltését és előkészítését a tanításra.
+Running `python src/main.py` performs data loading and preparation for train.
