@@ -18,7 +18,7 @@ Team members:
 
 We are doing the [Flower Classification](https://www.kaggle.com/competitions/tpu-getting-started) Kaggle competition.
 
-The `get_data.sh` script is used to download the data.
+The `get_data.sh` script is used to retrieve the data, but it requires a valid Kaggle token located at `~/.kaggle/kaggle.json`.
 
 ### Data exploration, visualization (if necessary).
 
