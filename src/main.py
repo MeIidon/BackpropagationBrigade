@@ -155,9 +155,7 @@ def main():
         NUM_VALIDATION_IMAGES_192,
     )
 
-    dataset_192 = dataset_192.unbatch().batch(20)
-    batch_192 = iter(dataset_192)
-
+    batch_192 = iter(ds_valid_192.unbatch().batch(20))
     images, labels = next(batch_192)
     probabilities = model_192.predict(images)
     predictions = np.argmax(probabilities, axis=-1)
