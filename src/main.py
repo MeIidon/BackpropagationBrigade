@@ -55,6 +55,12 @@ def visualize_data(ds_train, ds_valid, ds_test):
     display_batch_of_images(one_batch)
 
 
+from visualization import CLASSES
+from models import create_vgg16_model, compile_model
+from metrics import display_training_curves, generate_confusion_matrix
+from prediction import generate_submission
+
+
 def main():
     print("Tensorflow version " + tf.__version__)
 
@@ -97,6 +103,54 @@ def main():
     )
 
     visualize_data(ds_train_512, ds_valid_512, ds_test_512)
+
+    with strategy.scope():
+        model_512 = create_vgg16_model(strategy, IMAGE_SIZE_512 + [3], len(CLASSES))
+
+    optimizer_512 = tf.keras.optimizers.Adam()
+
+    with strategy.scope():
+        compile_model(model_512, optimizer_512)
+        model_512.summary()
+
+    EPOCHS = 12
+    STEPS_PER_EPOCH_512 = NUM_TRAINING_IMAGES_512 // BATCH_SIZE
+
+    history_512 = model_512.fit(
+        ds_train_512,
+        validation_data=ds_valid_512,
+        epochs=EPOCHS,
+        steps_per_epoch=STEPS_PER_EPOCH_512,
+    )
+
+    display_training_curves(
+        history_512.history["loss"],
+        history_512.history["val_loss"],
+        "loss",
+        211,
+    )
+    display_training_curves(
+        history_512.history["sparse_categorical_accuracy"],
+        history_512.history["val_sparse_categorical_accuracy"],
+        "accuracy",
+        212,
+    )
+
+    generate_confusion_matrix(
+        model_512,
+        ds_valid_512,
+        NUM_VALIDATION_IMAGES_512,
+    )
+
+    dataset_512 = dataset_512.unbatch().batch(20)
+    batch_512 = iter(dataset_512)
+
+    images, labels = next(batch_512)
+    probabilities = model_512.predict(images)
+    predictions = np.argmax(probabilities, axis=-1)
+    display_batch_of_images((images, labels), predictions)
+
+    generate_submission(model_512, ds_test_512, "submission.csv", NUM_TEST_IMAGES_512)
 
 
 if __name__ == "__main__":
