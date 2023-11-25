@@ -1,11 +1,8 @@
-import re
 import numpy as np
 import tensorflow as tf
 
 
-def tpu_init():
-    print("Tensorflow version " + tf.__version__)
-
+def get_strategy():
     # Detect TPU, return appropriate distribution strategy
     try:
         tpu = tf.distribute.cluster_resolver.TPUClusterResolver()
@@ -16,7 +13,7 @@ def tpu_init():
     if tpu:
         tf.config.experimental_connect_to_cluster(tpu)
         tf.tpu.experimental.initialize_tpu_system(tpu)
-        strategy = tf.distribute.TPUStrategy(tpu)
+        strategy = tf.distribute.experimental.TPUStrategy(tpu)
     else:
         strategy = tf.distribute.get_strategy()
 
@@ -25,63 +22,76 @@ def tpu_init():
     return strategy
 
 
-from constants import TRAINING_FILENAMES, VALIDATION_FILENAMES, TEST_FILENAMES
-
-
-def count_data_items(filenames):
-    # the number of data items is written in the name of the .tfrec
-    # files, i.e. flowers00-230.tfrec = 230 data items
-    n = [
-        int(re.compile(r"-(\d*)\.").search(filename).group(1)) for filename in filenames
-    ]
-    return np.sum(n)
-
-
 from dataset_loader import (
     get_training_dataset,
     get_validation_dataset,
     get_test_dataset,
+    count_data_items,
 )
 from visualization import display_batch_of_images
 
 
 def main():
-    strategy = tpu_init()
+    print("Tensorflow version " + tf.__version__)
 
-    NUM_TRAINING_IMAGES = count_data_items(TRAINING_FILENAMES)
-    NUM_VALIDATION_IMAGES = count_data_items(VALIDATION_FILENAMES)
-    NUM_TEST_IMAGES = count_data_items(TEST_FILENAMES)
+    strategy = get_strategy()
+
+    BATCH_SIZE = 16 * strategy.num_replicas_in_sync
+    IMAGE_SIZE_512 = [512, 512]
+    DS_PATH = "data"
+    PATH_512 = DS_PATH + "/tfrecords-jpeg-512x512"
+
+    TRAINING_FILENAMES_512 = tf.io.gfile.glob(PATH_512 + "/train/*.tfrec")
+    VALIDATION_FILENAMES_512 = tf.io.gfile.glob(PATH_512 + "/val/*.tfrec")
+    TEST_FILENAMES_512 = tf.io.gfile.glob(PATH_512 + "/test/*.tfrec")  # 100 - 10
+
+    NUM_TRAINING_IMAGES_512 = count_data_items(TRAINING_FILENAMES_512)
+    NUM_VALIDATION_IMAGES_512 = count_data_items(VALIDATION_FILENAMES_512)
+    NUM_TEST_IMAGES_512 = count_data_items(TEST_FILENAMES_512)
+
     print(
-        f"Dataset: {NUM_TRAINING_IMAGES} training images, {NUM_VALIDATION_IMAGES} validation images, {NUM_TEST_IMAGES} unlabelled test images"
+        f"Dataset - 512 x 512: {NUM_TRAINING_IMAGES_512} training images",
+        f"{NUM_VALIDATION_IMAGES_512} validation images",
+        f"{NUM_TEST_IMAGES_512} unlabelled test images",
     )
 
-    # Define the batch size. This will be 16 with TPU off and 128 (=16*8) with TPU on
-    BATCH_SIZE = 16 * strategy.num_replicas_in_sync
+    ds_train_512 = get_training_dataset(
+        TRAINING_FILENAMES_512,
+        IMAGE_SIZE_512,
+        BATCH_SIZE,
+    )
+    ds_valid_512 = get_validation_dataset(
+        VALIDATION_FILENAMES_512,
+        IMAGE_SIZE_512,
+        BATCH_SIZE,
+    )
+    ds_test_512 = get_test_dataset(
+        TEST_FILENAMES_512,
+        IMAGE_SIZE_512,
+        BATCH_SIZE,
+    )
 
-    ds_train = get_training_dataset(BATCH_SIZE)
-    ds_valid = get_validation_dataset(BATCH_SIZE)
-    ds_test = get_test_dataset(BATCH_SIZE)
-
-    print("Training:", ds_train)
-    print("Validation:", ds_valid)
-    print("Test:", ds_test)
+    print("Training - 512:", ds_train_512)
+    print("Validation - 512:", ds_valid_512)
+    print("Test - 512:", ds_test_512)
 
     np.set_printoptions(threshold=15, linewidth=80)
 
-    print("Training data shapes:")
-    for image, label in ds_train.take(3):
+    print("Training - 512 data shapes:")
+    for image, label in ds_train_512.take(3):
         print(image.numpy().shape, label.numpy().shape)
-    print("Training data label examples:", label.numpy())
+    print("Training - 512 data label examples:", label.numpy())
 
-    print("Test data shapes:")
-    for image, id_num in ds_test.take(3):
+    print("Test - 512 data shapes:")
+    for image, id_num in ds_test_512.take(3):
         print(image.numpy().shape, id_num.numpy().shape)
-    print("Test data IDs:", id_num.numpy().astype("U"))  # U=unicode string
+    print("Test - 512 data IDs:", id_num.numpy().astype("U"))  # U=unicode string
 
-    ds_iter = iter(ds_train.unbatch().batch(20))
+    ds_iter_512 = iter(ds_train_512.unbatch().batch(20))
 
-    one_batch = next(ds_iter)
-    display_batch_of_images(one_batch)
+    print("PRINTING ONE BATCH OF 512 x 512 SIZE IMAGES")
+    one_batch_512 = next(ds_iter_512)
+    display_batch_of_images(one_batch_512)
 
 
 if __name__ == "__main__":
