@@ -33,6 +33,18 @@ class FlowerClassificationHomePage extends StatefulWidget {
 
 class _FlowerClassificationHomePageState extends State<FlowerClassificationHomePage> {
   XFile? _image;
+  Future<String>? _imageClassFuture;
+
+  Future<void> _classifyImage(XFile image) async {
+    // TODO: Call backend to classify image.
+    final imageClassFuture = Future.delayed(
+      const Duration(seconds: 2),
+      () => "Rose",
+    );
+    setState(() {
+      _imageClassFuture = imageClassFuture;
+    });
+  }
 
   Future<void> _selectImage() async {
     final imagePicker = ImagePicker();
@@ -43,6 +55,7 @@ class _FlowerClassificationHomePageState extends State<FlowerClassificationHomeP
     setState(() {
       _image = image;
     });
+    await _classifyImage(image);
   }
 
   @override
@@ -52,8 +65,32 @@ class _FlowerClassificationHomePageState extends State<FlowerClassificationHomeP
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("Flower Classification Home Page"),
       ),
-      body: Center(
-        child: ImageView(image: _image),
+      body: ListView(
+        children: [
+          Center(
+            child: FutureBuilder(
+              future: _imageClassFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const CircularProgressIndicator();
+                }
+                if (snapshot.hasError) {
+                  return Text(
+                    "Error: ${snapshot.error}",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+                }
+                return Text(
+                  "Image class: ${snapshot.data}",
+                  style: Theme.of(context).textTheme.headlineSmall,
+                );
+              },
+            ),
+          ),
+          ImageView(image: _image),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async => await _selectImage(),
