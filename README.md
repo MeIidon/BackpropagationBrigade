@@ -27,3 +27,8 @@ The `get_data.sh` script is used to retrieve the data, but it requires a valid K
 ### Preparing data for train, final output: train, validation and test inputs and outputs.
 
 Running `python src/main.py` performs data loading and preparation for train.
+
+### Open in Google Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/MeIidon/BackpropagationBrigade/blob/niki_s_b/main.ipynb]
+
