@@ -113,14 +113,27 @@ def main():
         compile_model(model_512, optimizer_512)
         model_512.summary()
 
-    EPOCHS = 12
+    EPOCHS = 16
     STEPS_PER_EPOCH_512 = NUM_TRAINING_IMAGES_512 // BATCH_SIZE
+
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        "model.h5",
+        save_best_only=True,
+        monitor="val_sparse_categorical_accuracy",
+        mode="max",
+    )
+    early_stopping_callback = tf.keras.callbacks.EarlyStopping(
+        monitor="val_sparse_categorical_accuracy",
+        patience=4,
+        mode="max",
+    )
 
     history_512 = model_512.fit(
         ds_train_512,
         validation_data=ds_valid_512,
         epochs=EPOCHS,
         steps_per_epoch=STEPS_PER_EPOCH_512,
+        callbacks=[model_checkpoint_callback, early_stopping_callback],
     )
 
     display_training_curves(
