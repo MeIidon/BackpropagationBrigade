@@ -1,3 +1,4 @@
-.env/
-data/
-tpu-getting-started.zip
+/.env
+/data
+__pycache__
+/tpu-getting-started.zip
