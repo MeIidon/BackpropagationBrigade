@@ -1,8 +1,8 @@
 {
     "recommendations": [
         "ms-python.python",
-        "sonarsource.sonarlint-vscode",
+        "ms-python.black-formatter",
+        "ms-toolsai.jupyter",
         "streetsidesoftware.code-spell-checker",
-        "usernamehw.errorlens"
     ]
 }
