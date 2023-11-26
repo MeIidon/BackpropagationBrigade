@@ -1,7 +1,11 @@
+import "dart:convert";
 import "dart:io";
+import "dart:isolate";
 
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
+import 'package:http/http.dart' as http;
+import "package:image/image.dart" show decodeImage;
 import "package:image_picker/image_picker.dart";
 
 void main() {
@@ -31,16 +35,58 @@ class FlowerClassificationHomePage extends StatefulWidget {
   State<FlowerClassificationHomePage> createState() => _FlowerClassificationHomePageState();
 }
 
+typedef Pixel = List<int>;
+typedef ImageData = List<List<Pixel>>;
+
 class _FlowerClassificationHomePageState extends State<FlowerClassificationHomePage> {
   XFile? _image;
   Future<String>? _imageClassFuture;
 
-  Future<void> _classifyImage(XFile image) async {
-    // TODO: Call backend to classify image.
-    final imageClassFuture = Future.delayed(
-      const Duration(seconds: 2),
-      () => "Rose",
+  Future<String?> _readFileAsJson(XFile image) async {
+    final imageBytes = await image.readAsBytes();
+    final decodedImage = decodeImage(imageBytes);
+    if (decodedImage == null) {
+      return null;
+    }
+    final ImageData imageData = [];
+    for (int y = 0; y < decodedImage.height; ++y) {
+      final List<Pixel> row = [];
+      for (int x = 0; x < decodedImage.width; ++x) {
+        final pixel = decodedImage.getPixel(x, y);
+        final red = pixel.r.toInt();
+        final green = pixel.g.toInt();
+        final blue = pixel.b.toInt();
+        row.add([red, green, blue]);
+      }
+      imageData.add(row);
+    }
+    final json = jsonEncode(imageData);
+    return json;
+  }
+
+  Future<String> _callBackend(String json) async {
+    final result = await http.post(
+      Uri.parse("http://localhost:5000/predict"),
+      body: json,
+      headers: {
+        "Content-Type": "application/json",
+      },
     );
+    if (result.statusCode != 200) {
+      return Future.error("Failed to classify image.");
+    }
+    return result.body;
+  }
+
+  Future<void> _classifyImage(XFile image) async {
+    final json = await Isolate.run(() async => await _readFileAsJson(image));
+    if (json == null) {
+      setState(() {
+        _imageClassFuture = Future.error("Failed to read image.");
+      });
+      return;
+    }
+    final imageClassFuture = _callBackend(json);
     setState(() {
       _imageClassFuture = imageClassFuture;
     });
@@ -71,6 +117,9 @@ class _FlowerClassificationHomePageState extends State<FlowerClassificationHomeP
             child: FutureBuilder(
               future: _imageClassFuture,
               builder: (context, snapshot) {
+                if (_imageClassFuture == null) {
+                  return Container();
+                }
                 if (snapshot.connectionState != ConnectionState.done) {
                   return const CircularProgressIndicator();
                 }
