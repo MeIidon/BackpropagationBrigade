@@ -42,51 +42,29 @@ class _FlowerClassificationHomePageState extends State<FlowerClassificationHomeP
   XFile? _image;
   Future<String>? _imageClassFuture;
 
-  Future<String?> _readFileAsJson(XFile image) async {
-    final imageBytes = await image.readAsBytes();
-    final decodedImage = decodeImage(imageBytes);
-    if (decodedImage == null) {
-      return null;
-    }
-    final ImageData imageData = [];
-    for (int y = 0; y < decodedImage.height; ++y) {
-      final List<Pixel> row = [];
-      for (int x = 0; x < decodedImage.width; ++x) {
-        final pixel = decodedImage.getPixel(x, y);
-        final red = pixel.r.toInt();
-        final green = pixel.g.toInt();
-        final blue = pixel.b.toInt();
-        row.add([red, green, blue]);
-      }
-      imageData.add(row);
-    }
-    final json = jsonEncode(imageData);
-    return json;
-  }
-
-  Future<String> _callBackend(String json) async {
-    final result = await http.post(
+  Future<String> _callBackend(String name, Uint8List bytes) async {
+    final request = http.MultipartRequest(
+      "POST",
       Uri.parse("http://localhost:5000/predict"),
-      body: json,
-      headers: {
-        "Content-Type": "application/json",
-      },
     );
-    if (result.statusCode != 200) {
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        "image",
+        bytes,
+        filename: name,
+      ),
+    );
+    final response = await request.send();
+    if (response.statusCode != 200) {
       return Future.error("Failed to classify image.");
     }
-    return result.body;
+    final result = await response.stream.bytesToString();
+    return Future.value(result);
   }
 
   Future<void> _classifyImage(XFile image) async {
-    final json = await Isolate.run(() async => await _readFileAsJson(image));
-    if (json == null) {
-      setState(() {
-        _imageClassFuture = Future.error("Failed to read image.");
-      });
-      return;
-    }
-    final imageClassFuture = _callBackend(json);
+    final imageAsBytes = await image.readAsBytes();
+    final imageClassFuture = _callBackend(image.name, imageAsBytes);
     setState(() {
       _imageClassFuture = imageClassFuture;
     });
@@ -132,7 +110,7 @@ class _FlowerClassificationHomePageState extends State<FlowerClassificationHomeP
                   );
                 }
                 return Text(
-                  "Image class: ${snapshot.data}",
+                  "Prediction: ${snapshot.data}",
                   style: Theme.of(context).textTheme.headlineSmall,
                 );
               },
