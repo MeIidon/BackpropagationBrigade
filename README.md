@@ -42,15 +42,13 @@ To create virtual environment running create_environment.sh that call requiremen
 
 We are doing the [Flower Classification](https://www.kaggle.com/competitions/tpu-getting-started) Kaggle competition.
 
-The `get_data.sh` script is used to retrieve the data, but it requires a valid Kaggle token located at `~/.kaggle/kaggle.json`.
-
 ### Data exploration, visualization (if necessary).
 
 ![](docs/flowers.png)
 
 ### Preparing data for train, final output: train, validation and test inputs and outputs.
 
-Running   `python trainer/tanitas.ipynb` performs data loading and preparation for train.
+Running   `python trainer/tanitas.ipynb` performs data loading and preparation for train and visualization for the outputs. 
 
 
 
