@@ -32,3 +32,30 @@ Running `python src/main.py` performs data loading and preparation for train.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/MeIidon/BackpropagationBrigade/blob/niki_s_b/main.ipynb]
 
+## Big homework - Milestone 2.
+
+## Create virtual environment 
+
+To create virtual environment running create_environment.sh that call requirements.txt to install necessary package. 
+
+### Identify data source and download scripts.
+
+We are doing the [Flower Classification](https://www.kaggle.com/competitions/tpu-getting-started) Kaggle competition.
+
+The `get_data.sh` script is used to retrieve the data, but it requires a valid Kaggle token located at `~/.kaggle/kaggle.json`.
+
+### Data exploration, visualization (if necessary).
+
+![](docs/flowers.png)
+
+### Preparing data for train, final output: train, validation and test inputs and outputs.
+
+Running  in trainer folder `python src/dataset_loader.py` performs data loading and preparation for train.
+Running  in trainer folder `python src/main.py` to train model. 
+To get final output running `python src/prediction.py`. 
+
+##Visualization
+
+Running in trainer folder `python src/metrics.py` to get confusion matrix. 
+
+
