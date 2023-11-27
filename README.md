@@ -50,12 +50,7 @@ The `get_data.sh` script is used to retrieve the data, but it requires a valid K
 
 ### Preparing data for train, final output: train, validation and test inputs and outputs.
 
-Running  in trainer folder `python src/dataset_loader.py` performs data loading and preparation for train.
-Running  in trainer folder `python src/main.py` to train model. 
-To get final output running `python src/prediction.py`. 
+Running   `python trainer/tanitas.ipynb` performs data loading and preparation for train.
 
-##Visualization
-
-Running in trainer folder `python src/metrics.py` to get confusion matrix. 
 
 
