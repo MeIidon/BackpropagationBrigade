@@ -30,7 +30,7 @@ Running `python src/main.py` performs data loading and preparation for train.
 
 ### Open in Google Colab
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/MeIidon/BackpropagationBrigade/blob/niki_s_b/main.ipynb]
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/MeIidon/BackpropagationBrigade/blob/niki_s_b/main.ipynb)
 
 ## Big homework - Milestone 2.
 
