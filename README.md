@@ -12,16 +12,14 @@ Team members:
 | Skáre Erik            | Z7ZF6D      |
 | Szommer Zsombor       | MM5NOT      |
 
-## Big homework - Milestone 1.
-
-### Data source
+## Data source
 
 We are doing the [Flower Classification](https://www.kaggle.com/competitions/tpu-getting-started) Kaggle competition.
 
-### Data exploration, visualization.
+## Data exploration, visualization.
 
 ![](docs/flowers.png)
 
-### Open in Google Colab
+## Open in Google Colab
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/MeIidon/BackpropagationBrigade/blob/niki_s_b/main.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/MeIidon/BackpropagationBrigade/blob/master/training.ipynb)
