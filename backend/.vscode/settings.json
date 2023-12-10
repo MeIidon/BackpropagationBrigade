@@ -1,9 +1,0 @@
-{
-    "python.envFile": "${workspaceFolder}/.env",
-    "cSpell.language": "en-GB",
-    "cSpell.words": [
-        "dtype",
-        "tensorflow",
-        "werkzeug"
-    ],
-}
