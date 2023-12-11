@@ -20,6 +20,10 @@ We are doing the [Flower Classification](https://www.kaggle.com/competitions/tpu
 
 ![](docs/flowers.png)
 
+## Gradio application
+
+You can try our demo app on [Hugging Face Spaces](https://huggingface.co/spaces/Melidon/flower-classification).
+
 ## Open in Google Colab
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/MeIidon/BackpropagationBrigade/blob/master/training.ipynb)
